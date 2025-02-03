@@ -22,5 +22,5 @@ A program to detect sign language hand signs in real-time via the webcam and out
 
 ## License
 
-Copyright (c) 2023 by [Simon Dwyer](https://github.com/4Tsuki4). Some rights reserved.<br>
-[Handy](https://github.com/4Tsuki4/Handy-Sign-Language-Detection) is licensed under the MIT License as stated in the [LICENSE file](LICENSE).
+Copyright (c) 2023 by [Simon Dwyer](https://github.com/sdwyersec). Some rights reserved.<br>
+[Handy](https://github.com/sdwyersec/Handy-Sign-Language-Detection) is licensed under the MIT License as stated in the [LICENSE file](LICENSE).
