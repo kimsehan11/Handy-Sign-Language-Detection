@@ -30,9 +30,12 @@ mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 hands = mp_hands.Hands(static_image_mode=False, min_detection_confidence=0.9, min_tracking_confidence=0.9)
-labels_dict = {0: "hello", 1: "i love you", 2: "yes", 3: "good", 4: "bad", 5: "okay", 6: "you", 7: "i/i'm", 8: "why", 9: "no"}
-
+labels_dict = {0: "hello", 1: "i love you", 2: "yes", 3: "good", 4: "bad", 5: "okay", 6: "you", 7: "i", 8: "why", 9: "no"}
+#문장 단위로 실행하기 위해서
+sentences = []
 prev_time = time.time()
+last_sign = None
+sign_hold_start = None
 
 while True:
     data_aux = []
@@ -71,10 +74,34 @@ while True:
             x_ = []
             y_ = []
 
-            if time.time() - prev_time >= 2:
-                tta = TextToAudio("com.apple.speech.synthesis.voice.Alex", 200, 1.0)
-                tta.text_to_audio(predicted_sign)
-                prev_time = time.time()
+        #predicted_sign이 0.5초 이상 유지되면 문장에 추가
+        if predicted_sign == last_sign:
+            if sign_hold_start is None:
+                sign_hold_start = time.time()
+            elif time.time() - sign_hold_start >= 1:
+                if not sentences:
+                    sentences.append(predicted_sign)
+                    sign_hold_start = None  # 첫 append는 0.5초만 유지되면 됨
+                elif sentences[-1] != predicted_sign:
+                    sentences.append(predicted_sign)
+                    sign_hold_start = None  # 두 번째부터는 0.5초+이전 단어와 달라야 함
+        else:
+            last_sign = predicted_sign
+            sign_hold_start = time.time()
+    else:
+        if sentences:
+            sentence_str = " ".join(sentences)
+            tta = TextToAudio("com.apple.speech.synthesis.voice.Alex", 200, 1.0)
+            tta.text_to_audio(sentence_str)
+            sentences.clear()
+        last_sign = None
+        sign_hold_start = None
+
+    # 자막(문장 리스트) 실시간 표시
+    if sentences:
+        subtitle = " ".join(sentences)
+        # 화면 하단에 자막 표시 (위치, 폰트, 크기, 색상 등 조정 가능)
+        cv2.putText(frame, subtitle, (30, H - 30), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 3, cv2.LINE_AA)
 
     cv2.imshow("Handy", frame)
     cv2.waitKey(1)
