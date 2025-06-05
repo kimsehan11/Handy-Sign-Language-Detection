@@ -3,6 +3,12 @@ import os
 import pickle
 import mediapipe as mp
 import cv2
+import string
+
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # TensorFlow warning 제거
+import absl.logging
+absl.logging.set_verbosity(absl.logging.ERROR)  # absl warning 제거
 
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
@@ -11,6 +17,12 @@ hands = mp_hands.Hands(static_image_mode=True, min_detection_confidence=0.5)
 data_dir = "./data"
 data = []
 labels = []
+
+digit_classes = [str(i) for i in range(10)] # '0'~'9',
+sentence_classes = [str(i) for i in range(10, 36)]# 'a'~'z' 
+
+data_digit, labels_digit = [], []
+data_sentences, labels_sentences = [], []
 
 for dir_ in os.listdir(data_dir):
     for img_path in os.listdir(os.path.join(data_dir, dir_)):
@@ -36,8 +48,15 @@ for dir_ in os.listdir(data_dir):
                         data_aux.append(x)
                         data_aux.append(y)
                 if len(data_aux) == 42:
-                    data.append(data_aux)
-                    labels.append(dir_)
-file = open("data.pickle", "wb")
-pickle.dump({"data": data, "labels": labels}, file)
+                    if dir_ in digit_classes:
+                        data_digit.append(data_aux)
+                        labels_digit.append(dir_)
+                    elif dir_ in sentence_classes:
+                        data_sentences.append(data_aux)
+                        labels_sentences.append(dir_)
+
+file = open("data_sentences.pickle", "wb")
+pickle.dump({"data": data_sentences, "labels": labels_sentences}, file)
+file = open("data_digit.pickle", "wb")
+pickle.dump({"data": data_digit, "labels": labels_digit}, file)
 file.close()
