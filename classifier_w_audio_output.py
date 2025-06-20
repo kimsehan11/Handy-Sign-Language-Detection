@@ -136,7 +136,7 @@ while True:
             if last_sign != predicted_sign:
                 last_sign = predicted_sign
                 sign_hold_start = time.time()
-            elif sign_hold_start is not None and time.time() - sign_hold_start >= 0.5:
+            elif sign_hold_start is not None and time.time() - sign_hold_start >= 1.0:
                 if predicted_sign == '0':
                     if sentences:
                         sentences.pop()
@@ -220,7 +220,7 @@ while True:
             if predicted_sign == last_sign:
                 if sign_hold_start is None:
                     sign_hold_start = time.time()
-                elif time.time() - sign_hold_start >= 2.0:
+                elif time.time() - sign_hold_start >= 1.0:
                     if predicted_sign != 'Unknown' and (landmark_diff is not None and landmark_diff < landmark_move_threshold):
                         sentences.append(predicted_sign)
                         # 알파벳이면 words에 추가, 아니면 words 초기화
